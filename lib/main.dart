@@ -76,7 +76,7 @@ class RandomWordsState extends State<RandomWords> {
                 style: _biggerFont,
               ),
             );
-          },
+          }, 
         );
         final List<Widget> divided = ListTile.divideTiles(
           context: context,
