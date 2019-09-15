@@ -1,8 +1,8 @@
 import 'package:english_words/english_words.dart' as prefix0;
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
-import 'dart:io';
-
+import 'DataProvider.dart';
+import 'dart:convert'; // string to List<String>
 
 class RandomWords extends StatefulWidget {
   List<WordPair> saved = <WordPair>[];
@@ -11,7 +11,21 @@ class RandomWords extends StatefulWidget {
   RandomWords({Key key, this.saved, this.randomList}) : super();
   @override
   RandomWordsState createState() => RandomWordsState();
- 
+
+  void dataSave(){
+    //String savedString = saved.toString();
+    var savedString = <String>[];
+    for (WordPair e in saved)
+    {
+      savedString.add(e.first + '+' + e.second);
+    }
+    // savedString.toString() 으로 넣으면 a, b, c로 들어가는데
+    // 이를 저장했다가 load 하면서 string to List<String> 하기 위해 
+    // json.decode 를 사용하게 되면 에러가 난다. decode 는 "a", "b" 형태를
+    // 기반으로 decode 하기 때문
+    // 그래서 저장할 때에도 규칙에 맞게 encode 로 넣어준다.
+    writeData(json.encode(savedString));
+  }
 }
 
 class RandomWordsState extends State<RandomWords> {
@@ -32,8 +46,10 @@ class RandomWordsState extends State<RandomWords> {
           setState(() {
             if (alreadySaved) {
               widget.saved.remove(pair);
+              widget.dataSave();
             } else {
              widget.saved.add(pair);
+             widget.dataSave();
             }
           });
         });

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'FavoriteWords.dart';
 import 'RandomWords.dart';
+import 'DataProvider.dart';
+import 'dart:convert'; // string to List<String>
 
 void main() => runApp(MyApp());
 
@@ -30,7 +32,26 @@ class HomePageState extends State<HomePage> {
   int bottomSelectedIndex = 0;
   List<WordPair> saved = <WordPair>[];
   List<WordPair> randomList = <WordPair>[];
+  
+  void dataLoad(){
+    var str = ReadData();
+    str.then((value) {
+      // file io 는 async - await - Future(관계 확인하자)으로 사용하는듯
+      // 1. value 는 항상 string 으로만 들어오는가
+      // 2. then 과 WhenComplete 차이 확인하자
 
+      //var strList = (json.decode(value) as List<dynamic>).cast<String>();// string to List<String>
+      var strList = json.decode(value) as List<dynamic>;// string to List<String>
+      // [a, b, c] => a b c
+      for (String e in strList){
+        if (e.contains("+")) {
+          var subStr = e.split("+");
+          saved.add(WordPair(subStr.first, subStr.last));
+        }
+      }
+    });
+   
+  }
   List<BottomNavigationBarItem> buildBottomNavBarItems() {
     return [
       BottomNavigationBarItem(
@@ -62,6 +83,7 @@ Widget buildPageView() {
   @override
   void initState() {
     super.initState();
+    dataLoad();
   }
 
   void pageChanged(int index) {
