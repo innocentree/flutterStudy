@@ -12,13 +12,16 @@ class CheckLottoState extends State<CheckLotto> {
   final winnerLottoNum = 1;
   final winnerCount = 3;
   final winnerPrice = 5;
-
   final lottoUrl = 'https://www.dhlottery.co.kr/gameResult.do?method=byWin';
+  var specificNumberPage = "&drwNo="; // + num 해서 위에거에 붙이면 됨
   String lastWinNumber = "";
+  String selectedWinStage = "";
   var widgetWinNumber = Text("wait for Data...");
   var widgetWinPrice = Text("");
+  var widgetWinStage = Text("");
+
   var lottoStageList = <String>[];
-  
+
   String _dropdownValue = '-';
 
   List<String> DataPolishing(List<String> inData) {
@@ -34,17 +37,23 @@ class CheckLottoState extends State<CheckLotto> {
   }
 
   void RefreshData() {
-    final data = fetchHTML(lottoUrl);
+    String assembleURL = lottoUrl;
+    if (selectedWinStage.isNotEmpty) {
+      assembleURL = assembleURL + specificNumberPage + selectedWinStage;
+    }
+    final data = fetchHTML(assembleURL);
     data.then((value) {
       final splited = value.split(' ');
       final numberList = DataPolishing(splited);
       _dropdownValue = numberList[stageNum];
-      lottoStageList.clear();
-      for (int i = 1; i <= int.parse(numberList[stageNum]); i++) {
-        lottoStageList.insert(0, i.toString());
+      if (lottoStageList.isEmpty) {
+        for (int i = 1; i <= int.parse(numberList[stageNum]); i++) {
+          lottoStageList.insert(0, i.toString());
+        }
       }
       lastWinNumber = numberList[winnerLottoNum];
       setState(() {
+        widgetWinStage = Text(_dropdownValue + "회차 1등 번호");
         widgetWinNumber = Text("당첨번호 : " + numberList[winnerLottoNum]);
         widgetWinPrice = Text("당첨금 : " + numberList[winnerPrice] + "원");
       });
@@ -63,6 +72,7 @@ class CheckLottoState extends State<CheckLotto> {
         child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
+        widgetWinStage,
         widgetWinNumber,
         widgetWinPrice,
         Row(
@@ -72,8 +82,7 @@ class CheckLottoState extends State<CheckLotto> {
               onChanged: (String newValue) {
                 setState(() {
                   _dropdownValue = newValue;
-                  print("_dropdownValue : " + _dropdownValue);
-                  print("newValue : " + newValue);
+                  selectedWinStage = newValue;
                 });
               },
               value: _dropdownValue,
@@ -85,8 +94,9 @@ class CheckLottoState extends State<CheckLotto> {
                 );
               }).toList(),
             ),
+            Text("회차  "),
             FlatButton(
-              child: Text("데이터 갱신"),
+              child: Text("당첨번호 보기"),
               onPressed: () => RefreshData(),
               color: Color.fromRGBO(100, 100, 100, 200),
               splashColor: Colors.cyan,
