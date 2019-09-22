@@ -1,9 +1,6 @@
 
-import 'dart:collection';
-
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
   Future<String> get _localPath async {
