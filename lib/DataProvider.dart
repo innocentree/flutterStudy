@@ -19,7 +19,7 @@ Future<File> writeData(String data) async {
   return file.writeAsString(data);
 }
 
-Future<String> ReadData() async {
+Future<String> readData() async {
   try {
   final file = await _localFile;
   final len = file.lengthSync();
@@ -46,13 +46,13 @@ Future<String> fetchHTML(String url) async {
     return content;
 
         // 숫자 6 + 1개
-    final num1 = parsed.getElementsByClassName('ball_645').toList();
+    //final num1 = parsed.getElementsByClassName('ball_645').toList();
     //final tabledata = parsed.getElementsByClassName('tbl_data')[0].getElementsByTagName('tbody')[0].getElementsByClassName('tar').toList();
 
-    final index1 = content.indexOf(' ');
-    final index2 = content.indexOf('È'); // 회
-    final stage = content.substring(index1+1, index2);
-    final splited = content.split(' ');
+    //final index1 = content.indexOf(' ');
+    //final index2 = content.indexOf('È'); // 회
+    //final stage = content.substring(index1+1, index2);
+    //final splited = content.split(' ');
     //final decoded = utf8.decode(content)
 //    return response.body;
   }  else {
