@@ -15,7 +15,7 @@ class HomePageState extends State<HomePage> {
   List<WordPair> randomList = <WordPair>[];
   
   void dataLoad(){
-    var str = ReadData();
+    var str = readData();
     str.then((value) {
       // file io 는 async - await - Future(관계 확인하자)으로 사용하는듯
       // 1. value 는 항상 string 으로만 들어오는가
