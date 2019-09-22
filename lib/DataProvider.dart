@@ -41,8 +41,10 @@ Future<String> fetchHTML(String url) async {
   if (response.statusCode == 200){
     final parsed = parser.parse(response.body);
     final data = parsed.getElementById('desc');
+    final date = parsed.getElementsByClassName('desc'); // 추첨 날짜
 
-    final content = data.attributes['content'].toString();
+    var content = data.attributes['content'].toString();
+    content += " " + date[0].text;
     return content;
 
         // 숫자 6 + 1개

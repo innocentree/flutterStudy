@@ -12,6 +12,7 @@ class CheckLottoState extends State<CheckLotto> {
   final winnerLottoNum = 1;
   final winnerCount = 3;
   final eachWinnerPrice = 5;
+  final year = 6, month = 7, day = 8;
   final lottoUrl = 'https://www.dhlottery.co.kr/gameResult.do?method=byWin';
   var specificNumberPage = "&drwNo="; // + num 해서 위에거에 붙이면 됨
   String lastWinNumber = "";
@@ -70,6 +71,7 @@ class CheckLottoState extends State<CheckLotto> {
             children: <Widget>[
              fetchingDataList.isEmpty ? Text("wait for Data...") : Text(_dropdownValue + "회차 1등 번호"),
               Text("당첨번호 : " + (fetchingDataList.isNotEmpty ? fetchingDataList[winnerLottoNum]:"")),
+              fetchingDataList.isEmpty ? "" : Text("당첨일 : "+fetchingDataList[year]+"년 "+fetchingDataList[month]+"월 "+fetchingDataList[day]+"일"),
               fetchingDataList.isEmpty ? Text("") : Text("당첨자 : " + fetchingDataList[winnerCount] + "명"),
               Text("1인당 당첨금액 : " + (fetchingDataList.isNotEmpty ? fetchingDataList[eachWinnerPrice]:"") + "원"),
               Row(
@@ -112,3 +114,13 @@ class CheckLottoState extends State<CheckLotto> {
           ));
   }
 }
+/*
+          https://www.dhlottery.co.kr/common.do?method=main
+          <div class="next_time">
+					<h3>다음회차</h3>
+					<span class="date">2019-09-22 23:55 현재</span>
+					<ul>
+						<li><strong>예상당첨금</strong><span>459,530,805<span class="accessibility">원</span></span></li>
+						<li><strong>누적판매금</strong><span>1,910,675,000<span class="accessibility">원</span></span></li>
+					</ul>
+*/
