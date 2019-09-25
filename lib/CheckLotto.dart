@@ -19,7 +19,9 @@ class CheckLottoState extends State<CheckLotto> {
   String selectedWinStage = "";
   var lottoStageList = <String>[];
   var fetchingDataList = <String>[];
-  var _isLoading = false;
+  var _isLoading1 = false, _isLoading2 = false;
+  var accumulatedPrize = "";
+  var accumulatedPriod = "";
 
   String _dropdownValue = '-';
   List<String> dataPolishing(List<String> inData) {
@@ -33,7 +35,7 @@ class CheckLottoState extends State<CheckLotto> {
     return foundData;
   }
 
-  void refreshData() {
+  void refreshDataLotto() {
     String assembleURL = lottoUrl;
     if (selectedWinStage.isNotEmpty) {
       assembleURL = assembleURL + specificNumberPage + selectedWinStage;
@@ -50,30 +52,73 @@ class CheckLottoState extends State<CheckLotto> {
       }
       lastWinNumber = fetchingDataList[winnerLottoNum];
       setState(() {
-        _isLoading = false;
+        _isLoading1 = false;
       });
+    });
+  }
+
+  void refreshDataNextPrize() {
+    /*
+          <div class="next_time">
+					<h3>다음회차</h3>
+					<span class="date">2019-09-22 23:55 현재</span>
+					<ul>
+						<li><strong>예상당첨금</strong><span>459,530,805<span class="accessibility">원</span></span></li>
+						<li><strong>누적판매금</strong><span>1,910,675,000<span class="accessibility">원</span></span></li>
+					</ul>
+*/
+    final data =
+        fetchEstimatePrize("https://www.dhlottery.co.kr/common.do?method=main");
+    data.then((onValue) {
+      if (onValue.isNotEmpty) {
+        setState(() {
+          accumulatedPriod = onValue[0].replaceAll(new RegExp(r'([^0-9^:^\-^\s])'), '');
+          accumulatedPrize = onValue[1].replaceAll(new RegExp(r'([^0-9^,^+])?([,]$)?'), '');
+          _isLoading2 = false;
+        });
+      }
     });
   }
 
   @override
   void initState() {
     super.initState();
-    refreshData();
+    refreshDataLotto();
+    refreshDataNextPrize();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
+    return _isLoading1 || _isLoading1
         ? Center(child: CircularProgressIndicator())
         : Center(
             child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-             fetchingDataList.isEmpty ? Text("wait for Data...") : Text(_dropdownValue + "회차 1등 번호"),
-              Text("당첨번호 : " + (fetchingDataList.isNotEmpty ? fetchingDataList[winnerLottoNum]:"")),
-              fetchingDataList.isEmpty ? "" : Text("당첨일 : "+fetchingDataList[year]+"년 "+fetchingDataList[month]+"월 "+fetchingDataList[day]+"일"),
-              fetchingDataList.isEmpty ? Text("") : Text("당첨자 : " + fetchingDataList[winnerCount] + "명"),
-              Text("1인당 당첨금액 : " + (fetchingDataList.isNotEmpty ? fetchingDataList[eachWinnerPrice]:"") + "원"),
+              fetchingDataList.isEmpty
+                  ? Text("wait for Data...")
+                  : Text(_dropdownValue + "회차 1등 번호"),
+              Text("당첨번호 : " +
+                  (fetchingDataList.isNotEmpty
+                      ? fetchingDataList[winnerLottoNum]
+                      : "")),
+              fetchingDataList.isEmpty
+                  ? ""
+                  : Text("당첨일 : " +
+                      fetchingDataList[year] +
+                      "년 " +
+                      fetchingDataList[month] +
+                      "월 " +
+                      fetchingDataList[day] +
+                      "일"),
+              fetchingDataList.isEmpty
+                  ? Text("")
+                  : Text("당첨자 : " + fetchingDataList[winnerCount] + "명"),
+              Text("1인당 당첨금액 : " +
+                  (fetchingDataList.isNotEmpty
+                      ? fetchingDataList[eachWinnerPrice]
+                      : "") +
+                  "원"),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -100,9 +145,9 @@ class CheckLottoState extends State<CheckLotto> {
                       setState(() {
                         // setState 에 의해 값을 바꿔줘야만 widget 을 새로 build 한다.
                         // 값만 바꿔주면 widget 에 notify 할 수 없음
-                        _isLoading = true;
+                        _isLoading1 = true;
                       });
-                      refreshData();
+                      refreshDataLotto();
                     },
                     color: Color.fromRGBO(100, 100, 100, 200),
                     splashColor: Colors.cyan,
@@ -110,17 +155,26 @@ class CheckLottoState extends State<CheckLotto> {
                   ),
                 ],
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text("이번 주 예상 당첨 금액 : " + accumulatedPrize + "원"),
+                  FlatButton(
+                    child: Text("데이터 갱신"),
+                    onPressed: () {
+                      setState(() {
+                        _isLoading2 = false;
+                      });
+                      refreshDataNextPrize();
+                    },
+                    color: Color.fromRGBO(100, 100, 100, 200),
+                    splashColor: Colors.cyan,
+                    focusColor: Colors.indigo,
+                  )
+                ],
+              ),
+              Text("(" + accumulatedPriod + "현재)"),
             ],
           ));
   }
 }
-/*
-          https://www.dhlottery.co.kr/common.do?method=main
-          <div class="next_time">
-					<h3>다음회차</h3>
-					<span class="date">2019-09-22 23:55 현재</span>
-					<ul>
-						<li><strong>예상당첨금</strong><span>459,530,805<span class="accessibility">원</span></span></li>
-						<li><strong>누적판매금</strong><span>1,910,675,000<span class="accessibility">원</span></span></li>
-					</ul>
-*/

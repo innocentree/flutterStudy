@@ -33,9 +33,22 @@ Future<String> readData() async {
   }
 }
 
+Future<List<String>> fetchEstimatePrize(String url) async {
+  final response = await http.get(url); 
+  if (response.statusCode == 200) {
+    final parsed = parser.parse(response.body);
+    final data = parsed.getElementsByClassName("next_time");
+    final content = data[0].getElementsByTagName("span").toList();
+    final nextDate = content[0].text;//data[0].getElementsByClassName("date");
+    final nextPrize = content[1].text;
+    var dataList = <String>[];
+    dataList.addAll([nextDate, nextPrize]);
+    return dataList;
+  } else {
+    return <String>[];
+  }  
+}
 Future<String> fetchHTML(String url) async {
-  
-  
   final response = await http.get(url); 
   //headers:{"charset":"EUC-KR","Accept-Charset":"EUC-KR"});
   if (response.statusCode == 200){
